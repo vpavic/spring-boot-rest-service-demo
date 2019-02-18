@@ -28,8 +28,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-hateoas")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
-    implementation("org.atteo:evo-inflector:1.2.2")
-
     runtimeOnly("com.h2database:h2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")

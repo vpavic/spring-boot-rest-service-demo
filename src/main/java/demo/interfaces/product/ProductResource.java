@@ -2,7 +2,9 @@ package demo.interfaces.product;
 
 import demo.domain.model.product.Product;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.Relation;
 
+@Relation(collectionRelation = "item")
 class ProductResource extends ResourceSupport {
 
     private final String name;
@@ -14,7 +16,7 @@ class ProductResource extends ResourceSupport {
         this.price = price;
     }
 
-    static ProductResource fromEntity(Product product) {
+    static ProductResource fromProduct(Product product) {
         return new ProductResource(product.getName(), product.getPrice());
     }
 

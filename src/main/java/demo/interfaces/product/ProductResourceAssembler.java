@@ -14,10 +14,14 @@ class ProductResourceAssembler extends ResourceAssemblerSupport<Product, Product
 
     @Override
     public ProductResource toResource(Product entity) {
-        ProductResource resource = ProductResource.fromEntity(entity);
-        resource.add(linkTo(methodOn(ProductController.class).findOne(entity.getId())).withSelfRel());
-        resource.add(linkTo(methodOn(ProductController.class).findAll(null, null)).withRel("products"));
+        ProductResource resource = createResourceWithId(entity.getId(), entity);
+        resource.add(linkTo(methodOn(ProductController.class).findAll(null, null)).withRel("collection"));
         return resource;
+    }
+
+    @Override
+    protected ProductResource instantiateResource(Product entity) {
+        return ProductResource.fromProduct(entity);
     }
 
 }
