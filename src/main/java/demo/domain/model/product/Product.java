@@ -1,7 +1,6 @@
 package demo.domain.model.product;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.UUID;
 
@@ -9,17 +8,18 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    @GeneratedValue
     private UUID id;
 
     private String name;
 
     private double price;
 
+    @SuppressWarnings("unused")
     Product() {
     }
 
     public Product(String name, double price) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.price = price;
     }

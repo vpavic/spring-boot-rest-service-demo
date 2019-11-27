@@ -12,9 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -30,15 +30,15 @@ public class ProductController {
 
     private static final ProductResourceAssembler resourceAssembler = new ProductResourceAssembler();
 
-    private final ProductRepository productRepository;
+    private final ProductRepository repository;
 
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(ProductRepository repository) {
+        this.repository = repository;
     }
 
     @GetMapping
     public ResponseEntity<CollectionModel<ProductResource>> findAll(PagedResourcesAssembler<Product> pageableAssembler, Pageable pageable) {
-        Page<Product> products = this.productRepository.findAll(pageable);
+        Page<Product> products = this.repository.findAll(pageable);
         PagedModel<ProductResource> resources = pageableAssembler.toModel(products, resourceAssembler);
         for (ProductResource resource : resources) {
             resource.getLink(IanaLinkRelations.SELF).ifPresent(
@@ -50,14 +50,14 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody CreateProductRequest request) {
         Product product = new Product(request.getName(), request.getPrice());
-        this.productRepository.save(product);
+        this.repository.save(product);
         URI location = linkTo(methodOn(ProductController.class).findOne(product.getId())).toUri();
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> findOne(@PathVariable UUID id) {
-        Product product = this.productRepository.findById(id);
+        Product product = this.repository.findById(id);
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
@@ -65,24 +65,24 @@ public class ProductController {
         return ResponseEntity.ok(resource);
     }
 
-    @PutMapping(path = "/{id}")
+    @PatchMapping(path = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id, @RequestBody UpdateProductRequest request) {
-        Product product = this.productRepository.findById(id);
+        Product product = this.repository.findById(id);
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
         product.updatePrice(request.getPrice());
-        this.productRepository.save(product);
+        this.repository.save(product);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        Product product = this.productRepository.findById(id);
+        Product product = this.repository.findById(id);
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
-        this.productRepository.delete(product);
+        this.repository.delete(product);
         return ResponseEntity.noContent().build();
     }
 

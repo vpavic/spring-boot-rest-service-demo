@@ -15,9 +15,9 @@ public class ProductGenerator implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        this.repository.save(new Product("chair", 9.99));
-        this.repository.save(new Product("desk", 99.99));
-        this.repository.save(new Product("laptop", 999.99));
+        this.repository.save(new Product("chair", 9.90));
+        this.repository.save(new Product("desk", 99.90));
+        this.repository.save(new Product("laptop", 999.90));
     }
 
 }
