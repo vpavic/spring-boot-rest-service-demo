@@ -5,18 +5,24 @@ import demo.domain.model.product.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.net.URI;
 import java.util.UUID;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Controller
 @RequestMapping(path = "/product")
@@ -31,11 +37,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Resources<ProductResource>> findAll(PagedResourcesAssembler<Product> pageableAssembler, Pageable pageable) {
+    public ResponseEntity<CollectionModel<ProductResource>> findAll(PagedResourcesAssembler<Product> pageableAssembler, Pageable pageable) {
         Page<Product> products = this.productRepository.findAll(pageable);
-        PagedResources<ProductResource> resources = pageableAssembler.toResource(products, resourceAssembler);
+        PagedModel<ProductResource> resources = pageableAssembler.toModel(products, resourceAssembler);
         for (ProductResource resource : resources) {
-            resources.add(resource.getLink(Link.REL_SELF).withRel("item"));
+            resource.getLink(IanaLinkRelations.SELF).ifPresent(
+                    link -> resources.add(link.withRel(IanaLinkRelations.ITEM)));
         }
         return ResponseEntity.ok(resources);
     }
@@ -54,7 +61,7 @@ public class ProductController {
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
-        ProductResource resource = resourceAssembler.toResource(product);
+        ProductResource resource = resourceAssembler.toModel(product);
         return ResponseEntity.ok(resource);
     }
 

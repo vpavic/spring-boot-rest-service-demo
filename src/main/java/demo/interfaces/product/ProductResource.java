@@ -1,11 +1,11 @@
 package demo.interfaces.product;
 
 import demo.domain.model.product.Product;
-import org.springframework.hateoas.ResourceSupport;
-import org.springframework.hateoas.core.Relation;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Relation(collectionRelation = "item")
-class ProductResource extends ResourceSupport {
+class ProductResource extends RepresentationModel<ProductResource> {
 
     private final String name;
 
