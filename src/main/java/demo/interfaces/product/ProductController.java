@@ -25,10 +25,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Controller
-@RequestMapping(path = "/product")
+@RequestMapping(path = "/products")
 public class ProductController {
-
-    private static final ProductResourceAssembler resourceAssembler = new ProductResourceAssembler();
 
     private final ProductRepository repository;
 
@@ -37,9 +35,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<ProductResource>> findAll(PagedResourcesAssembler<Product> pageableAssembler, Pageable pageable) {
+    public ResponseEntity<CollectionModel<ProductResource>> getAll(PagedResourcesAssembler<Product> pageableAssembler,
+            Pageable pageable) {
         Page<Product> products = this.repository.findAll(pageable);
-        PagedModel<ProductResource> resources = pageableAssembler.toModel(products, resourceAssembler);
+        PagedModel<ProductResource> resources = pageableAssembler.toModel(products, ProductResourceAssembler.instance);
         for (ProductResource resource : resources) {
             resource.getLink(IanaLinkRelations.SELF).ifPresent(
                     link -> resources.add(link.withRel(IanaLinkRelations.ITEM)));
@@ -51,22 +50,22 @@ public class ProductController {
     public ResponseEntity<Void> create(@RequestBody CreateProductRequest request) {
         Product product = new Product(request.getName(), request.getPrice());
         this.repository.save(product);
-        URI location = linkTo(methodOn(ProductController.class).findOne(product.getId())).toUri();
+        URI location = linkTo(methodOn(ProductController.class).getById(product.getId())).toUri();
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<?> findOne(@PathVariable UUID id) {
+    public ResponseEntity<?> getById(@PathVariable UUID id) {
         Product product = this.repository.findById(id);
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
-        ProductResource resource = resourceAssembler.toModel(product);
+        ProductResource resource = ProductResourceAssembler.instance.toModel(product);
         return ResponseEntity.ok(resource);
     }
 
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id, @RequestBody UpdateProductRequest request) {
+    public ResponseEntity<Void> updateById(@PathVariable UUID id, @RequestBody UpdateProductRequest request) {
         Product product = this.repository.findById(id);
         if (product == null) {
             return ResponseEntity.notFound().build();
@@ -77,7 +76,7 @@ public class ProductController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
         Product product = this.repository.findById(id);
         if (product == null) {
             return ResponseEntity.notFound().build();

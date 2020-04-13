@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -17,9 +17,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class RootController {
 
     @GetMapping
-    public ResponseEntity<CollectionModel<?>> root() {
-        CollectionModel<?> resources = new CollectionModel<>(Collections.emptyList());
-        resources.add(linkTo(methodOn(ProductController.class).findAll(null, null)).withRel("products"));
+    public ResponseEntity<CollectionModel<Void>> getRoot() {
+        CollectionModel<Void> resources = new CollectionModel<>(List.of());
+        resources.add(linkTo(methodOn(ProductController.class).getAll(null, null)).withRel("products"));
         return ResponseEntity.ok(resources);
     }
 
